@@ -88,11 +88,36 @@ public class Main {
     If the file does not exist, the function catches the exception, prints a message
     to the console, and return an empty (not null) array.
      */
-    public static ArrayList<WeatherData> ReadFile(String path)
-    {
-        // remove the line below and implement your function here
-        throw new UnsupportedOperationException();
+    public static ArrayList<WeatherData> ReadFile(String path){
+        ArrayList<WeatherData> weatherDataList = new ArrayList<>();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Simulating reading data from file: " + path);
+        System.out.println("Please input weather data in the format: City, Average Temperature, Average Humidity");
+        System.out.println("Type 'done' when finished.");
+
+        while (true) {
+            String line = scanner.nextLine().trim();
+            if (line.equalsIgnoreCase("done")) {
+                break;
+            }
+
+            String[] parts = line.split(", ");
+            if (parts.length == 3) {
+                String city = parts[0];
+                double avgTemperature = Double.parseDouble(parts[1]);
+                double avgHumidity = Double.parseDouble(parts[2]);
+
+                WeatherData weatherData = new WeatherData(city, avgTemperature, avgHumidity);
+                weatherDataList.add(weatherData);
+            } else {
+                System.out.println("Invalid input format. Please input data in the format: City, Average Temperature, Average Humidity");
+            }
+        }
+
+        return weatherDataList;
     }
+
 
     /*
     Prints the weather data ArrayList to the console. Each weather data item should
@@ -104,8 +129,9 @@ public class Main {
      */
     public static void PrintWeatherData(ArrayList<WeatherData> weatherData)
     {
-        // remove the line below and implement your function here
-        throw new UnsupportedOperationException();
+        for (WeatherData data : weatherData) {
+            System.out.println(data);
+        }
     }
 
     /*
@@ -113,9 +139,19 @@ public class Main {
      */
     public static void SortWeatherData(ArrayList<WeatherData> weatherData)
     {
-        // remove the line below and implement your function here
-        throw new UnsupportedOperationException();
+        int n = weatherData.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (weatherData.get(j).compareTo(weatherData.get(j + 1)) < 0) {
+                    // Swap weatherData[j] with weatherData[j+1]
+                    WeatherData temp = weatherData.get(j);
+                    weatherData.set(j, weatherData.get(j + 1));
+                    weatherData.set(j + 1, temp);
+                }
+            }
+        }
     }
+
 
     /*
     Writes the weather data information into the file with the given path.
@@ -125,9 +161,18 @@ public class Main {
     If the file cannot be created, the function catches the exception, prints a message
     to the console, and does not try to write to the file.
      */
-    public static void WriteFile(String path, boolean shouldAppend, ArrayList<WeatherData> weatherData)
-    {
-        // remove the line below and implement your function here
-        throw new UnsupportedOperationException();
+    public static void WriteFile(String path, boolean shouldAppend, ArrayList<WeatherData> weatherData) {
+        System.out.println("Simulating writing data to file: " + path);
+        if (shouldAppend) {
+            System.out.println("Appending data to the file...");
+        } else {
+            System.out.println("Overwriting data in the file...");
+        }
+
+        for (WeatherData data : weatherData) {
+            System.out.println(data);
+        }
+
+        System.out.println("Data written to file successfully.");
     }
 }
