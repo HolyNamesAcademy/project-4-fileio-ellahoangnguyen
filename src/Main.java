@@ -1,5 +1,9 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.FileOutputStream;
 
 public class Main {
 
@@ -90,29 +94,39 @@ public class Main {
      */
     public static ArrayList<WeatherData> ReadFile(String path){
         ArrayList<WeatherData> weatherDataList = new ArrayList<>();
-        Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Simulating reading data from file: " + path);
-        System.out.println("Please input weather data in the format: City, Average Temperature, Average Humidity");
-        System.out.println("Type 'done' when finished.");
+        java.io.File file = new java.io.File(path);
 
-        while (true) {
-            String line = scanner.nextLine().trim();
-            if (line.equalsIgnoreCase("done")) {
-                break;
+        // Create the file if it doesn't exist
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+                System.out.println("File created: " + path);
+            } catch (IOException e) {
+                System.out.println("Error creating file: " + path);
+                e.printStackTrace(); // Print the stack trace for debugging
             }
+            return weatherDataList;
+        }
 
-            String[] parts = line.split(", ");
-            if (parts.length == 3) {
-                String city = parts[0];
-                double avgTemperature = Double.parseDouble(parts[1]);
-                double avgHumidity = Double.parseDouble(parts[2]);
+        // If the file exists, read its contents
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] parts = line.split(", ");
+                if (parts.length == 3) {
+                    String city = parts[0];
+                    double avgTemperature = Double.parseDouble(parts[1]);
+                    double avgHumidity = Double.parseDouble(parts[2]);
 
-                WeatherData weatherData = new WeatherData(city, avgTemperature, avgHumidity);
-                weatherDataList.add(weatherData);
-            } else {
-                System.out.println("Invalid input format. Please input data in the format: City, Average Temperature, Average Humidity");
+                    WeatherData weatherData = new WeatherData(city, avgTemperature, avgHumidity);
+                    weatherDataList.add(weatherData);
+                } else {
+                    System.out.println("Invalid data format in the file: " + path);
+                }
             }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found: " + path);
         }
 
         return weatherDataList;
