@@ -93,43 +93,25 @@ public class Main {
     to the console, and return an empty (not null) array.
      */
     public static ArrayList<WeatherData> ReadFile(String path){
-        ArrayList<WeatherData> weatherDataList = new ArrayList<>();
-
-        java.io.File file = new java.io.File(path);
-
-        // Create the file if it doesn't exist
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-                System.out.println("File created: " + path);
-            } catch (IOException e) {
-                System.out.println("Error creating file: " + path);
-                e.printStackTrace(); // Print the stack trace for debugging
-            }
-            return weatherDataList;
-        }
-
-        // If the file exists, read its contents
-        try (Scanner scanner = new Scanner(file)) {
+        ArrayList<WeatherData> weatherData = new ArrayList<>();
+        try {
+            File file = new File(path);
+            Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                String[] parts = line.split(", ");
-                if (parts.length == 3) {
-                    String city = parts[0];
-                    double avgTemperature = Double.parseDouble(parts[1]);
-                    double avgHumidity = Double.parseDouble(parts[2]);
-
-                    WeatherData weatherData = new WeatherData(city, avgTemperature, avgHumidity);
-                    weatherDataList.add(weatherData);
-                } else {
-                    System.out.println("Invalid data format in the file: " + path);
-                }
+                String[] parts = line.split(",");
+                String city = parts[0].trim();
+                double averageTemp = Double.parseDouble(parts[1].trim());
+                double averageHumidity = Double.parseDouble(parts[2].trim());
+                weatherData.add(new WeatherData(city, averageTemp, averageHumidity));
             }
+            scanner.close();
         } catch (FileNotFoundException e) {
-            System.out.println("File not found: " + path);
+            System.out.println("File not found. Returning empty weather data list.");
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid format in the file. Returning empty weather data list.");
         }
-
-        return weatherDataList;
+        return weatherData;
     }
 
 
@@ -153,17 +135,7 @@ public class Main {
      */
     public static void SortWeatherData(ArrayList<WeatherData> weatherData)
     {
-        int n = weatherData.size();
-        for (int i = 0; i < n - 1; i++) {
-            for (int j = 0; j < n - i - 1; j++) {
-                if (weatherData.get(j).compareTo(weatherData.get(j + 1)) < 0) {
-                    // Swap weatherData[j] with weatherData[j+1]
-                    WeatherData temp = weatherData.get(j);
-                    weatherData.set(j, weatherData.get(j + 1));
-                    weatherData.set(j + 1, temp);
-                }
-            }
-        }
+        weatherData.sort((a, b) -> Double.compare(b.getAverageTemp(), a.getAverageTemp()));
     }
 
 
@@ -176,17 +148,14 @@ public class Main {
     to the console, and does not try to write to the file.
      */
     public static void WriteFile(String path, boolean shouldAppend, ArrayList<WeatherData> weatherData) {
-        System.out.println("Simulating writing data to file: " + path);
-        if (shouldAppend) {
-            System.out.println("Appending data to the file...");
-        } else {
-            System.out.println("Overwriting data in the file...");
+        try {
+            PrintWriter writer = new PrintWriter(new FileOutputStream(path, shouldAppend));
+            for (WeatherData data : weatherData) {
+                writer.println(data);
+            }
+            writer.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File cannot be created. Unable to write weather data.");
         }
-
-        for (WeatherData data : weatherData) {
-            System.out.println(data);
-        }
-
-        System.out.println("Data written to file successfully.");
     }
 }
