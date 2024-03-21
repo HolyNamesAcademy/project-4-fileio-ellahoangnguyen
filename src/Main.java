@@ -1,5 +1,9 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.FileOutputStream;
 
 public class Main {
 
@@ -88,11 +92,28 @@ public class Main {
     If the file does not exist, the function catches the exception, prints a message
     to the console, and return an empty (not null) array.
      */
-    public static ArrayList<WeatherData> ReadFile(String path)
-    {
-        // remove the line below and implement your function here
-        throw new UnsupportedOperationException();
+    public static ArrayList<WeatherData> ReadFile(String path){
+        ArrayList<WeatherData> weatherData = new ArrayList<>();
+        try {
+            File file = new File(path);
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] parts = line.split(",");
+                String city = parts[0].trim();
+                double averageTemp = Double.parseDouble(parts[1].trim());
+                double averageHumidity = Double.parseDouble(parts[2].trim());
+                weatherData.add(new WeatherData(city, averageTemp, averageHumidity));
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found. Returning empty weather data list.");
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid format in the file. Returning empty weather data list.");
+        }
+        return weatherData;
     }
+
 
     /*
     Prints the weather data ArrayList to the console. Each weather data item should
@@ -104,8 +125,9 @@ public class Main {
      */
     public static void PrintWeatherData(ArrayList<WeatherData> weatherData)
     {
-        // remove the line below and implement your function here
-        throw new UnsupportedOperationException();
+        for (WeatherData data : weatherData) {
+            System.out.println(data);
+        }
     }
 
     /*
@@ -113,9 +135,9 @@ public class Main {
      */
     public static void SortWeatherData(ArrayList<WeatherData> weatherData)
     {
-        // remove the line below and implement your function here
-        throw new UnsupportedOperationException();
+        weatherData.sort((a, b) -> Double.compare(b.getAverageTemp(), a.getAverageTemp()));
     }
+
 
     /*
     Writes the weather data information into the file with the given path.
@@ -125,9 +147,15 @@ public class Main {
     If the file cannot be created, the function catches the exception, prints a message
     to the console, and does not try to write to the file.
      */
-    public static void WriteFile(String path, boolean shouldAppend, ArrayList<WeatherData> weatherData)
-    {
-        // remove the line below and implement your function here
-        throw new UnsupportedOperationException();
+    public static void WriteFile(String path, boolean shouldAppend, ArrayList<WeatherData> weatherData) {
+        try {
+            PrintWriter writer = new PrintWriter(new FileOutputStream(path, shouldAppend));
+            for (WeatherData data : weatherData) {
+                writer.println(data);
+            }
+            writer.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File cannot be created. Unable to write weather data.");
+        }
     }
 }
